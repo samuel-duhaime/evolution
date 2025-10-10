@@ -6,6 +6,7 @@
  */
 import moment from 'moment';
 import knex from 'chaire-lib-backend/lib/config/shared/db.config';
+import { Response, Request } from 'express';
 
 import router from 'chaire-lib-backend/lib/api/admin.routes';
 // Add export routes from admin/exports.routes
@@ -13,7 +14,7 @@ import { addExportRoutes } from './admin/exports.routes';
 
 addExportRoutes();
 
-router.all('/data/widgets/:widget/', (req, res, _next) => {
+router.all('/data/widgets/:widget/', (req: Request, res: Response, _next) => {
     const widgetName = req.params.widget;
 
     if (!widgetName) {
@@ -33,13 +34,36 @@ router.all('/data/widgets/:widget/', (req, res, _next) => {
     case 'interviews-completion-rate':
         getInterviewsCompletionRate(res);
         break;
+    case 'median-survey-duration':
+        getMedianSurveyDuration(res);
+        break;
+    case 'estimated-median-survey-duration':
+        getEstimatedMedianSurveyDuration(res);
+        break;
+    case 'average-survey-interest':
+        getAverageSurveyInterest(res);
+        break;
+    case 'average-survey-difficulty':
+        getAverageSurveyDifficulty(res);
+        break;
+    case 'survey-duration-perception':
+        getSurveyDurationPerception(res);
+        break;
+    case 'survey-difficulty':
+        getSurveyDifficultyDistribution(res);
+        break;
+    case 'survey-demandingness':
+        getSurveyDemandingness(res);
+        break;
     default:
-        // TODO: new widgets will be added
+        return res
+            .status(404)
+            .json({ status: 'ERROR', message: `Admin monitoring widget '${widgetName}' not found` });
     }
 });
 
 // TODO: add CSV export for this widget:
-const getStartedAndCompletedInterviewsByDay = async (res) => {
+const getStartedAndCompletedInterviewsByDay = async (res: Response) => {
     // Get the sum directly from the DB, using the started_at date for grouping
     const subquery = knex('sv_interviews').select(
         'id',
@@ -97,7 +121,7 @@ const getCompletedInterviewsCountFromDb = async () => {
 };
 
 // Get the count of started interviews
-const getStartedInterviewsCount = async (res) => {
+const getStartedInterviewsCount = async (res: Response) => {
     try {
         const startedInterviewsCount = await getStartedInterviewsCountFromDb();
         return res.status(200).json({ status: 'OK', startedInterviewsCount });
@@ -108,7 +132,7 @@ const getStartedInterviewsCount = async (res) => {
 };
 
 // Get the count of completed interviews
-const getCompletedInterviewsCount = async (res) => {
+const getCompletedInterviewsCount = async (res: Response) => {
     try {
         const completedInterviewsCount = await getCompletedInterviewsCountFromDb();
         return res.status(200).json({ status: 'OK', completedInterviewsCount });
@@ -119,7 +143,7 @@ const getCompletedInterviewsCount = async (res) => {
 };
 
 // Get the interviews completion rate (completed / started, as a percentage, rounded to 1 decimal)
-const getInterviewsCompletionRate = async (res) => {
+const getInterviewsCompletionRate = async (res: Response) => {
     try {
         // Get counts using helper functions
         const startedCount = await getStartedInterviewsCountFromDb();
@@ -133,6 +157,66 @@ const getInterviewsCompletionRate = async (res) => {
         console.error('Error fetching interviews completion rate:', error);
         return res.status(500).json({ status: 'ERROR', message: 'Failed to fetch interviews completion rate' });
     }
+};
+
+// Get the median survey duration in minutes from completed interviews
+const getMedianSurveyDuration = async (res: Response) => {
+    // TODO: Implement median survey duration calculation
+    return res.status(200).json({ status: 'OK', medianSurveyDuration: 0 });
+};
+
+// Get the estimated median survey duration in minutes based on survey design
+const getEstimatedMedianSurveyDuration = async (res: Response) => {
+    // TODO: Implement estimated median survey duration calculation
+    return res.status(200).json({ status: 'OK', estimatedMedianSurveyDuration: 0 });
+};
+
+// Get the average survey interest rating from respondent feedback
+const getAverageSurveyInterest = async (res: Response) => {
+    // TODO: Implement average survey interest calculation
+    return res.status(200).json({ status: 'OK', averageSurveyInterest: 0 });
+};
+
+// Get the average survey difficulty rating from respondent feedback
+const getAverageSurveyDifficulty = async (res: Response) => {
+    // TODO: Implement average survey difficulty calculation
+    return res.status(200).json({ status: 'OK', averageSurveyDifficulty: 0 });
+};
+
+// Get the survey duration perception rating from respondent feedback
+const getSurveyDurationPerception = async (res: Response) => {
+    // TODO: Implement survey duration perception calculation
+    return res.status(200).json({ status: 'OK', surveyDurationPerception: 0 });
+};
+
+// TODO: Replace the example implementation below with real data from the database
+// Get the survey difficulty distribution from respondent feedback
+const getSurveyDifficultyDistribution = async (res: Response) => {
+    try {
+        // Example distribution data
+        const distribution = [
+            { value: 3, valueName: '0-10 %', valueUnit: ' %' },
+            { value: 8, valueName: '10-20 %', valueUnit: ' %' },
+            { value: 15, valueName: '20-30 %', valueUnit: ' %' },
+            { value: 25, valueName: '30-40 %', valueUnit: ' %' },
+            { value: 20, valueName: '40-50 %', valueUnit: ' %' },
+            { value: 18, valueName: '50-60 % ', valueUnit: ' %' },
+            { value: 10, valueName: '60-70 % ', valueUnit: ' %' },
+            { value: 1, valueName: '70-80 % ', valueUnit: ' %' },
+            { value: 3, valueName: '80-90 % ', valueUnit: ' %' },
+            { value: 8, valueName: '90-100 % ', valueUnit: ' %' }
+        ];
+        return res.status(200).json({ status: 'OK', data: distribution });
+    } catch (error) {
+        console.error('Error fetching survey difficulty distribution:', error);
+        return res.status(500).json({ status: 'ERROR', message: 'Failed to fetch survey difficulty distribution' });
+    }
+};
+
+// Get the survey demandingness rating from respondent feedback
+const getSurveyDemandingness = async (res: Response) => {
+    // TODO: Implement survey demandingness calculation
+    return res.status(200).json({ status: 'OK', surveyDemandingness: 0 });
 };
 
 export default router;
