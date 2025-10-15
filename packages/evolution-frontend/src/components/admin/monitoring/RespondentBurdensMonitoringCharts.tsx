@@ -17,49 +17,17 @@ export const RespondentBurdensMonitoringCharts: React.FC = () => {
         <section className="monitoring-section">
             <h2>{t('admin:monitoring.RespondentBurdensSection')}</h2>
             <div className="monitoring-charts-container">
-                {/* <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/median-survey-duration"
-                    valueName="medianSurveyDuration"
-                    valueTitle={t('admin:monitoring.MedianSurveyDuration')}
-                    valueUnit="minutes"
+                {/* TODO: Do a survey duration distribution */}
+                {/* TODO: Do a estimated duration distribution or difference (?) */}
+                {/* TODO: Do a survey demandingness distribution */}
+                {/* TODO: Do a survey interest distribution */}
+                {/* TODO: Do a survey duration perception distribution */}
+                <HorizontalBarMonitoringChart
+                    apiUrl="/api/admin/data/widgets/survey-difficulty-distribution"
+                    chartTitle={t('admin:monitoring.SurveyDifficultyChartTitle')}
+                    xAxisTitle={t('admin:monitoring.DistributionTitle')}
+                    yAxisTitle={t('admin:monitoring.SurveyDifficultyYAxisTitle')}
                 />
-                <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/estimated-median-survey-duration"
-                    valueName="estimatedMedianSurveyDuration"
-                    valueTitle={t('admin:monitoring.EstimatedMedianSurveyDuration')}
-                    valueUnit="minutes"
-                />
-                <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/average-survey-interest"
-                    valueName="averageSurveyInterest"
-                    valueTitle={t('admin:monitoring.AverageSurveyInterest')}
-                    valueUnit="%"
-                />
-                <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/average-survey-difficulty"
-                    valueName="averageSurveyDifficulty"
-                    valueTitle={t('admin:monitoring.AverageSurveyDifficulty')}
-                    valueUnit="%"
-                />
-                <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/survey-duration-perception"
-                    valueName="surveyDurationPerception"
-                    valueTitle={t('admin:monitoring.SurveyDurationPerception')}
-                    valueUnit="%"
-                />*/}
-                <HorizontalBarMonitoringChart />
-                {/* <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/survey-difficulty"
-                    valueName="surveyDifficulty"
-                    valueTitle={t('admin:monitoring.SurveyDifficulty')}
-                    valueUnit="%"
-                />
-                <SingleValueMonitoringChart
-                    apiUrl="/api/admin/data/widgets/survey-demandingness"
-                    valueName="surveyDemandingness"
-                    valueTitle={t('admin:monitoring.SurveyDemandingness')}
-                    valueUnit="%"
-                /> */}
             </div>
         </section>
     );

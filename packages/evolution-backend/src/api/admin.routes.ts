@@ -5,11 +5,9 @@
  * License text available at https://opensource.org/licenses/MIT
  */
 import moment from 'moment';
-import knex from 'chaire-lib-backend/lib/config/shared/db.config';
 import { Response, Request } from 'express';
-
+import knex from 'chaire-lib-backend/lib/config/shared/db.config';
 import router from 'chaire-lib-backend/lib/api/admin.routes';
-// Add export routes from admin/exports.routes
 import { addExportRoutes } from './admin/exports.routes';
 
 addExportRoutes();
@@ -49,7 +47,7 @@ router.all('/data/widgets/:widget/', (req: Request, res: Response, _next) => {
     case 'survey-duration-perception':
         getSurveyDurationPerception(res);
         break;
-    case 'survey-difficulty':
+    case 'survey-difficulty-distribution':
         getSurveyDifficultyDistribution(res);
         break;
     case 'survey-demandingness':
@@ -189,23 +187,52 @@ const getSurveyDurationPerception = async (res: Response) => {
     return res.status(200).json({ status: 'OK', surveyDurationPerception: 0 });
 };
 
-// TODO: Replace the example implementation below with real data from the database
 // Get the survey difficulty distribution from respondent feedback
 const getSurveyDifficultyDistribution = async (res: Response) => {
     try {
-        // Example distribution data
-        const distribution = [
-            { value: 3, valueName: '0-10 %', valueUnit: ' %' },
-            { value: 8, valueName: '10-20 %', valueUnit: ' %' },
-            { value: 15, valueName: '20-30 %', valueUnit: ' %' },
-            { value: 25, valueName: '30-40 %', valueUnit: ' %' },
-            { value: 20, valueName: '40-50 %', valueUnit: ' %' },
-            { value: 18, valueName: '50-60 % ', valueUnit: ' %' },
-            { value: 10, valueName: '60-70 % ', valueUnit: ' %' },
-            { value: 1, valueName: '70-80 % ', valueUnit: ' %' },
-            { value: 3, valueName: '80-90 % ', valueUnit: ' %' },
-            { value: 8, valueName: '90-100 % ', valueUnit: ' %' }
-        ];
+        // Query all completed interviews with a non-null 'response.end.difficultyOfTheSurvey'
+        const rows = await knex('sv_interviews')
+            .select(knex.raw('CAST(response->\'end\'->>\'difficultyOfTheSurvey\' AS FLOAT) as difficulty'))
+            .whereRaw('response->\'end\'->\'difficultyOfTheSurvey\' IS NOT NULL');
+
+        // Bin the values into 10 bins: 0-10, 11-20, 21-30, ..., 91-100
+        const bins = Array.from({ length: 10 }, (_, i) => {
+            const min = i === 0 ? 0 : i * 10 + 1;
+            const max = (i + 1) * 10;
+            return {
+                min,
+                max,
+                count: 0,
+                label: `${min}-${max} %`
+            };
+        });
+
+        // Count the number of responses in each bin
+        for (const row of rows) {
+            const difficulty = Number(row.difficulty);
+            if (isNaN(difficulty)) continue;
+
+            // Find the correct bin
+            let binIdx = -1;
+            if (difficulty >= 0 && difficulty <= 10) {
+                binIdx = 0;
+            } else {
+                binIdx = bins.findIndex((bin, i) => i > 0 && difficulty >= bin.min && difficulty <= bin.max);
+            }
+            if (binIdx >= 0 && binIdx < bins.length) {
+                bins[binIdx].count += 1;
+            }
+        }
+
+        // Calculate total for percentage
+        const total = bins.reduce((sum, bin) => sum + bin.count, 0);
+
+        // Format for frontend: include count (value) and percentage
+        const distribution = bins.map(({ count, label }) => ({
+            label,
+            percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+            count
+        }));
         return res.status(200).json({ status: 'OK', data: distribution });
     } catch (error) {
         console.error('Error fetching survey difficulty distribution:', error);

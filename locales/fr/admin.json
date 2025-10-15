@@ -208,8 +208,11 @@
         "AverageSurveyInterest": "Intérêt moyen de l'enquête",
         "AverageSurveyDifficulty": "Difficulté moyenne de l'enquête",
         "SurveyDurationPerception": "Perception de la durée de l'enquête",
-        "SurveyDifficulty": "Difficulté de l'enquête",
-        "SurveyDemandingness": "Exigence de l'enquête",
+        "DistributionTitle": "Distribution (%)",
+        "SurveyDifficultyChartTitle": "Distribution de la difficulté de l'enquête",
+        "SurveyDifficultyYAxisTitle": "Niveau de difficulté (%)",
+        "SurveyDemandingnessChartTitle": "Distribution de l'exigence de l'enquête",
+        "SurveyDemandingnessYAxisTitle": "Niveau d'exigence (%)",
         "errors": {
             "invalidValueType": "Type de valeur invalide reçu du serveur.",
             "jsonConversion": "Erreur lors de la conversion des données en JSON.",
